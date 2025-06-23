@@ -16,7 +16,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users/**",
                                 "/api/auctions/**",
-                                "/api/categories/**"
+                                "/api/categories/**",
+                                "/api/bids/**"
                         ).permitAll()  // Allow your test endpoints
                         .anyRequest().authenticated()                // All others require auth
                 );

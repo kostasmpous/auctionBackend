@@ -5,5 +5,6 @@ import lombok.Data;
 @Data
 public class SellerSummaryDTO {
     private Long id;
-    private String username;
+    private String name;
+    private String lastName;
 }

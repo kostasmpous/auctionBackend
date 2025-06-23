@@ -46,7 +46,8 @@ public class AuctionController {
                     // Map seller
                     SellerSummaryDTO sellerDto = new SellerSummaryDTO();
                     sellerDto.setId(auction.getSeller().getId());
-                    sellerDto.setUsername(auction.getSeller().getUsername());
+                    sellerDto.setName(auction.getSeller().getFirstName());
+                    sellerDto.setLastName(auction.getSeller().getLastName());
                     dto.setSeller(sellerDto);
 
                     // Map categories
