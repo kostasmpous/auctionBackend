@@ -9,6 +9,8 @@ import com.auction.auctionbackend.repository.AuctionRepository;
 import com.auction.auctionbackend.repository.BidRepository;
 import com.auction.auctionbackend.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -33,9 +35,13 @@ public class BidController {
     // Create bid
     @PostMapping
     public ResponseEntity<BidDTO> createBid(@RequestBody BidRequestDTO request) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
         Auction auction = auctionRepository.findById(request.getAuctionId())
                 .orElseThrow(() -> new RuntimeException("Auction not found"));
-        User bidder = userRepository.findById(request.getBidderId())
+        User bidder = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Bid bid = new Bid();
