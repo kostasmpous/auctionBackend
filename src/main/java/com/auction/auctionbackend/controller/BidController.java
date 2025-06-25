@@ -1,9 +1,14 @@
 package com.auction.auctionbackend.controller;
 import com.auction.auctionbackend.dto.BidDTO;
 
-import com.auction.auctionbackend.dto.BidDTO;
+import com.auction.auctionbackend.dto.BidRequestDTO;
+import com.auction.auctionbackend.model.Auction;
 import com.auction.auctionbackend.model.Bid;
+import com.auction.auctionbackend.model.User;
+import com.auction.auctionbackend.repository.AuctionRepository;
 import com.auction.auctionbackend.repository.BidRepository;
+import com.auction.auctionbackend.repository.UserRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -14,16 +19,43 @@ import java.util.List;
 public class BidController {
 
     private final BidRepository bidRepository;
+    // Add dependencies to the constructor
+    private final AuctionRepository auctionRepository;
+    private final UserRepository userRepository;
 
-    public BidController(BidRepository bidRepository) {
+    public BidController(BidRepository bidRepository, AuctionRepository auctionRepository, UserRepository userRepository) {
         this.bidRepository = bidRepository;
+        this.auctionRepository = auctionRepository;
+        this.userRepository = userRepository;
     }
+
 
     // Create bid
     @PostMapping
-    public Bid createBid(@RequestBody Bid bid) {
-        bid.setTime(LocalDateTime.now()); // Set current time on creation
-        return bidRepository.save(bid);
+    public ResponseEntity<BidDTO> createBid(@RequestBody BidRequestDTO request) {
+        Auction auction = auctionRepository.findById(request.getAuctionId())
+                .orElseThrow(() -> new RuntimeException("Auction not found"));
+        User bidder = userRepository.findById(request.getBidderId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Bid bid = new Bid();
+        bid.setAmount(request.getAmount());
+        bid.setAuction(auction);
+        bid.setBidder(bidder);
+        bid.setTime(LocalDateTime.now());
+
+        Bid saved = bidRepository.save(bid);
+
+        // Convert to DTO
+        BidDTO dto = new BidDTO();
+        dto.setId(saved.getId());
+        dto.setAmount(saved.getAmount());
+        dto.setTime(saved.getTime());
+        dto.setAuctionId(saved.getAuction().getId());
+        dto.setBidderId(saved.getBidder().getId());
+        dto.setBidderUsername(saved.getBidder().getUsername());
+
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping
