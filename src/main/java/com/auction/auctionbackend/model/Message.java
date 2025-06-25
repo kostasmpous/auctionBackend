@@ -20,6 +20,9 @@ public class Message {
 
     private LocalDateTime timestamp;
 
+    @Column(name = "is_unread", nullable = false)
+    private Boolean isUnread = true;
+
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
