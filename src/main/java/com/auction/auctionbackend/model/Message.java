@@ -3,6 +3,8 @@ package com.auction.auctionbackend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "messages")
 @Data
@@ -14,9 +16,9 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String subject;
-    private String body;
-    private boolean isUnread = true;
+    private String content;
+
+    private LocalDateTime timestamp;
 
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
