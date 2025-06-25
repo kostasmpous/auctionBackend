@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "categories")  // Replace with your Neon schema
+@Table(name = "categories")  // Replace it with your Neon schema
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
