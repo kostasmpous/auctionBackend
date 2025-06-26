@@ -13,4 +13,5 @@ public class BidDTO {
     private String bidderUsername;
     private Double bidderRating;
     private String bidderLocation;
+    private String bidderFullName;
 }

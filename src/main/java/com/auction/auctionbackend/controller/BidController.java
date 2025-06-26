@@ -75,6 +75,8 @@ public class BidController {
                     dto.setAuctionId(bid.getAuction().getId());
                     dto.setBidderId(bid.getBidder().getId());
                     dto.setBidderUsername(bid.getBidder().getUsername());
+                    dto.setBidderRating(bid.getBidder().getRatingAsBidder());
+                    dto.setBidderLocation(bid.getBidder().getLocation());
                     return dto;
                 })
                 .toList();
@@ -94,8 +96,9 @@ public class BidController {
         dto.setAuctionId(bid.getAuction().getId());
         dto.setBidderId(bid.getBidder().getId());
         dto.setBidderUsername(bid.getBidder().getUsername());
-        dto.setBidderLocation(bid.getBidder().getLocation());
+        dto.setBidderLocation(bid.getBidder().getLocation() + "," + bid.getBidder());
         dto.setBidderRating(bid.getBidder().getRatingAsBidder());
+        dto.setBidderFullName(bid.getBidder().getFirstName() + " " + bid.getBidder().getLastName());
         return dto;
     }
 
