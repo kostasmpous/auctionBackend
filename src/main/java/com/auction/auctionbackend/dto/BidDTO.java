@@ -11,4 +11,6 @@ public class BidDTO {
     private Long auctionId;
     private Long bidderId;
     private String bidderUsername;
+    private Double bidderRating;
+    private String bidderLocation;
 }

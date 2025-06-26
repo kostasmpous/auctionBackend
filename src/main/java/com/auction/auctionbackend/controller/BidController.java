@@ -94,7 +94,8 @@ public class BidController {
         dto.setAuctionId(bid.getAuction().getId());
         dto.setBidderId(bid.getBidder().getId());
         dto.setBidderUsername(bid.getBidder().getUsername());
-
+        dto.setBidderLocation(bid.getBidder().getLocation());
+        dto.setBidderRating(bid.getBidder().getRatingAsBidder());
         return dto;
     }
 
