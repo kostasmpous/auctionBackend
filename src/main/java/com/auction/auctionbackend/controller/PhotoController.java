@@ -1,34 +1,34 @@
 package com.auction.auctionbackend.controller;
 
+import com.auction.auctionbackend.model.Auction;
 import com.auction.auctionbackend.model.Photo;
+import com.auction.auctionbackend.repository.AuctionRepository;
 import com.auction.auctionbackend.repository.PhotoRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/photos")
 public class PhotoController {
 
     private final PhotoRepository photoRepository;
+    private final AuctionRepository auctionRepository;
 
-    public PhotoController(PhotoRepository photoRepository) {
+    public PhotoController(PhotoRepository photoRepository, AuctionRepository auctionRepository) {
         this.photoRepository = photoRepository;
+        this.auctionRepository = auctionRepository;
     }
 
     @PostMapping
-    public Photo createPhoto(@RequestBody Photo photo) {
-        return photoRepository.save(photo);
-    }
+    public ResponseEntity<?> addPhoto(@RequestParam Long auctionId, @RequestParam String url) {
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(() -> new RuntimeException("Auction not found"));
 
-    @GetMapping
-    public List<Photo> getAllPhotos() {
-        return photoRepository.findAll();
-    }
+        Photo photo = new Photo();
+        photo.setUrl(url);
+        photo.setAuction(auction);
 
-    @GetMapping("/{id}")
-    public Photo getPhotoById(@PathVariable Long id) {
-        return photoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Photo not found"));
+        return ResponseEntity.ok(photoRepository.save(photo));
     }
 }

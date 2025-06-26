@@ -2,7 +2,11 @@ package com.auction.auctionbackend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Formula;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -40,9 +44,15 @@ public class Auction {
 
     private String country;
 
+    @Formula("(SELECT COUNT(*) FROM bids b WHERE b.auction_id = id)")
+    private Long bidCount;
+
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
+
+    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Photo> photos = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
