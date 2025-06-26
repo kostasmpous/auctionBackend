@@ -89,6 +89,7 @@ public class AuctionController {
         sellerDto.setId(auction.getSeller().getId());
         sellerDto.setName(auction.getSeller().getFirstName());
         sellerDto.setLastName(auction.getSeller().getLastName());
+        sellerDto.setRating(auction.getSeller().getRatingAsSeller());
         dto.setSeller(sellerDto);
 
         Set<CategorySummaryDTO> categoryDtos = auction.getCategories().stream()
