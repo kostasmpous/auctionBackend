@@ -14,4 +14,6 @@ public class AuctionListDTO {
     private Double currentPrice;
     private SellerSummaryDTO seller;
     private Set<CategorySummaryDTO> categories;
+    private Double startPrice;
+    private Long bidCounts;
 }

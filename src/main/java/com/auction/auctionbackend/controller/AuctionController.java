@@ -41,7 +41,8 @@ public class AuctionController {
                     dto.setStartTime(auction.getStartTime());
                     dto.setEndTime(auction.getEndTime());
                     dto.setCurrentPrice(auction.getCurrentPrice());
-
+                    dto.setBidCounts(auction.getBidCount());
+                    dto.setStartPrice(auction.getStartingPrice());
                     // Map seller
                     SellerSummaryDTO sellerDto = new SellerSummaryDTO();
                     sellerDto.setId(auction.getSeller().getId());
