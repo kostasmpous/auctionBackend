@@ -2,10 +2,13 @@ package com.auction.auctionbackend.controller;
 
 import com.auction.auctionbackend.dto.*;
 import com.auction.auctionbackend.model.Auction;
+import com.auction.auctionbackend.model.User;
 import com.auction.auctionbackend.repository.AuctionRepository;
 import com.auction.auctionbackend.repository.BidRepository;
+import com.auction.auctionbackend.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,10 +20,12 @@ public class AuctionController {
 
     private final AuctionRepository auctionRepository;
     private final BidRepository bidRepository;
+    private final UserRepository userRepository;
 
-    public AuctionController(AuctionRepository auctionRepository, BidRepository bidRepository ) {
+    public AuctionController(AuctionRepository auctionRepository, BidRepository bidRepository,UserRepository userRepository ) {
         this.auctionRepository = auctionRepository;
         this.bidRepository = bidRepository;
+        this.userRepository = userRepository;
     }
 
     @PostMapping
@@ -133,6 +138,47 @@ public class AuctionController {
         }
 
         auctionRepository.delete(auction);
+    }
+    @GetMapping("/my-auctions")
+    public List<AuctionListDTO> getMyAuctions(Principal principal) {
+        String username = principal.getName();
+
+        // Fetch the seller (user)
+        User seller = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Fetch auctions created by this seller
+        List<Auction> auctions = auctionRepository.findBySellerIdWithCategories(seller.getId());
+
+        // Map to DTO
+        return auctions.stream().map(auction -> {
+            AuctionListDTO dto = new AuctionListDTO();
+            dto.setId(auction.getId());
+            dto.setName(auction.getName());
+            dto.setDescription(auction.getDescription());
+            dto.setStartTime(auction.getStartTime());
+            dto.setEndTime(auction.getEndTime());
+            dto.setCurrentPrice(auction.getCurrentPrice());
+            dto.setBidCounts(auction.getBidCount());
+            dto.setStartPrice(auction.getStartingPrice());
+
+            SellerSummaryDTO sellerDto = new SellerSummaryDTO();
+            sellerDto.setId(auction.getSeller().getId());
+            sellerDto.setName(auction.getSeller().getFirstName());
+            sellerDto.setLastName(auction.getSeller().getLastName());
+            dto.setSeller(sellerDto);
+
+            Set<CategorySummaryDTO> categoryDtos = auction.getCategories().stream()
+                    .map(cat -> {
+                        CategorySummaryDTO cDto = new CategorySummaryDTO();
+                        cDto.setId(cat.getId());
+                        cDto.setName(cat.getName());
+                        return cDto;
+                    }).collect(Collectors.toSet());
+
+            dto.setCategories(categoryDtos);
+            return dto;
+        }).toList();
     }
 
 }
