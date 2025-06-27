@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface BidRepository extends JpaRepository<Bid, Long> {
     boolean existsByAuction_SellerAndBidder(User seller, User bidder);
     java.util.List<Bid> findByAuctionId(Long auctionId);
+    boolean existsByAuctionId(Long auctionId);
 
 
 }

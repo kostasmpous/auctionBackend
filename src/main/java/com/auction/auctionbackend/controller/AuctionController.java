@@ -119,4 +119,20 @@ public class AuctionController {
 
         return dto;
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteAuction(@PathVariable Long id) {
+        Auction auction = auctionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Auction not found"));
+
+        boolean hasBids = bidRepository.existsByAuctionId(id);
+        boolean hasNotStarted = auction.getStartTime().isAfter(java.time.LocalDateTime.now());
+
+        if (hasBids || !hasNotStarted) {
+            throw new RuntimeException("Cannot delete auction that has already started or has bids.");
+        }
+
+        auctionRepository.delete(auction);
+    }
+
 }
