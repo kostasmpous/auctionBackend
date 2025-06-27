@@ -181,4 +181,32 @@ public class AuctionController {
         }).toList();
     }
 
+    @PutMapping("/{id}")
+    public Auction editAuction(@PathVariable Long id, @RequestBody Auction updatedAuction, Principal principal) {
+        // Get current user from JWT
+        String username = principal.getName();
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Auction existingAuction = auctionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Auction not found"));
+
+        // Allow only the seller to update
+        if (!existingAuction.getSeller().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Unauthorized to edit this auction");
+        }
+
+        // Allow edit only if auction has not ended
+        if (existingAuction.getEndTime().isBefore(java.time.LocalDateTime.now())) {
+            throw new RuntimeException("Cannot edit an auction that has already ended");
+        }
+
+        // Update only description and endTime
+        existingAuction.setDescription(updatedAuction.getDescription());
+        existingAuction.setEndTime(updatedAuction.getEndTime());
+
+        return auctionRepository.save(existingAuction);
+    }
+
+
 }
