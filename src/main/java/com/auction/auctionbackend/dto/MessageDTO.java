@@ -11,6 +11,7 @@ public class MessageDTO {
     private Boolean unread;
     private java.time.LocalDateTime timestamp;
     private String senderUsername;
+    private String receiverUsername;
 }
 
 

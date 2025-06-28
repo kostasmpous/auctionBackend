@@ -92,6 +92,7 @@ public class MessageController {
         dto.setTimestamp(message.getTimestamp());
         dto.setUnread(message.getIsUnread());
         dto.setId(message.getId());
+        dto.setReceiverUsername(message.getReceiver().getUsername());
         dto.setUnread(Boolean.TRUE.equals(message.getIsUnread())); // <-- safer check here
         dto.setSenderUsername(message.getSender().getUsername());
         return dto;
