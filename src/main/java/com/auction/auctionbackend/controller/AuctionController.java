@@ -11,7 +11,6 @@ import com.auction.auctionbackend.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.security.PrivateKey;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -247,6 +246,23 @@ public class AuctionController {
 
         return auctionRepository.save(existingAuction);
     }
+
+    @GetMapping("/public")
+    public List<AuctionMinimalDTO> getPublicAuctions() {
+        return auctionRepository.findAllWithCategoriesAndSeller().stream().map(auction -> {
+            AuctionMinimalDTO dto = new AuctionMinimalDTO();
+            dto.setId(auction.getId());
+            dto.setName(auction.getName());
+            dto.setDescription(auction.getDescription());
+            dto.setStartingPrice(auction.getStartingPrice());
+            dto.setCurrentPrice(auction.getCurrentPrice());
+            dto.setBidCount(auction.getBidCount());
+            dto.setStartTime(auction.getStartTime());
+            dto.setEndTime(auction.getEndTime());
+            return dto;
+        }).toList();
+    }
+
 
 
 }
