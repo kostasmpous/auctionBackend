@@ -93,7 +93,7 @@ public class MessageController {
         dto.setUnread(message.getIsUnread());
         dto.setId(message.getId());
         dto.setUnread(Boolean.TRUE.equals(message.getIsUnread())); // <-- safer check here
-
+        dto.setSenderUsername(message.getSender().getUsername());
         return dto;
     }
     @PutMapping("/{id}/read")

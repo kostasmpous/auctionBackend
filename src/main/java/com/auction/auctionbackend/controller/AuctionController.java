@@ -1,14 +1,8 @@
 package com.auction.auctionbackend.controller;
 
 import com.auction.auctionbackend.dto.*;
-import com.auction.auctionbackend.model.Auction;
-import com.auction.auctionbackend.model.AuctionStatus;
-import com.auction.auctionbackend.model.Category;
-import com.auction.auctionbackend.model.User;
-import com.auction.auctionbackend.repository.AuctionRepository;
-import com.auction.auctionbackend.repository.BidRepository;
-import com.auction.auctionbackend.repository.CategoryRepository;
-import com.auction.auctionbackend.repository.UserRepository;
+import com.auction.auctionbackend.model.*;
+import com.auction.auctionbackend.repository.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -27,12 +21,14 @@ public class AuctionController {
     private final UserRepository userRepository;
 
     private final CategoryRepository categoryRepository;
+    private final MessageRepository messageRepository;
 
-    public AuctionController(AuctionRepository auctionRepository, BidRepository bidRepository, UserRepository userRepository, CategoryRepository categoryRepository) {
+    public AuctionController(AuctionRepository auctionRepository, BidRepository bidRepository, UserRepository userRepository, CategoryRepository categoryRepository, MessageRepository messageRepository) {
         this.auctionRepository = auctionRepository;
         this.bidRepository = bidRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.messageRepository = messageRepository;
     }
 
     @PostMapping
@@ -285,14 +281,38 @@ public class AuctionController {
         User currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Allow ending only if it hasn’t already ended
+        if (!auction.getSeller().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Unauthorized to end this auction");
+        }
+
         if (auction.getStatus() == AuctionStatus.ENDED) {
             throw new RuntimeException("Auction is already ended");
         }
 
         auction.setStatus(AuctionStatus.ENDED);
-        return auctionRepository.save(auction);
+        Auction savedAuction = auctionRepository.save(auction);
+
+        // Find highest bid for the auction
+        var highestBidOpt = bidRepository.findTopByAuctionOrderByAmountDesc(auction);
+
+        if (highestBidOpt.isPresent()) {
+            var winningBid = highestBidOpt.get();
+            var winner = winningBid.getBidder();
+
+            // Create message to the winner
+            Message message = new Message();
+            message.setSender(auction.getSeller()); // seller
+            message.setReceiver(winner);
+            message.setContent("Congratulations! You won the auction for '" + auction.getName() + "'. Please contact me as soon as possible to arrange the transaction.");
+            message.setTimestamp(LocalDateTime.now());
+            message.setIsUnread(true);
+
+            messageRepository.save(message);
+        }
+
+        return savedAuction;
     }
+
 
 
 

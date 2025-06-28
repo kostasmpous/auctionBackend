@@ -10,6 +10,7 @@ public class MessageDTO {
     private Long senderId;
     private Boolean unread;
     private java.time.LocalDateTime timestamp;
+    private String senderUsername;
 }
 
 
