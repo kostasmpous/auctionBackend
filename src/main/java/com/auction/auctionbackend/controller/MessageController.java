@@ -52,16 +52,66 @@ public class MessageController {
         message.setTimestamp(LocalDateTime.now());
 
         messageRepository.save(message);
-        return ResponseEntity.ok(message);
+        MessageDTO responseDto = new MessageDTO();
+        responseDto.setContent(message.getContent());
+        responseDto.setReceiverId(message.getReceiver().getId());
+        responseDto.setSenderId(message.getSender().getId());
+        responseDto.setTimestamp(message.getTimestamp());
+        responseDto.setUnread(message.getIsUnread());
+        return ResponseEntity.ok(responseDto);
+
     }
 
 
 
-    @GetMapping("/user/{userId}")
-    public List<Message> getUserMessages(@PathVariable Long userId) {
-        User user = userRepository.findById(userId)
+    @GetMapping("/received")
+    public List<MessageDTO> getReceivedMessages(Principal principal) {
+        User user = userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return messageRepository.findBySenderOrReceiver(user, user);
+        return messageRepository.findByReceiver(user).stream()
+                .map(this::toDTO)
+                .toList();
     }
+
+    @GetMapping("/sent")
+    public List<MessageDTO> getSentMessages(Principal principal) {
+        User user = userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return messageRepository.findBySender(user).stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    private MessageDTO toDTO(Message message) {
+        MessageDTO dto = new MessageDTO();
+        dto.setContent(message.getContent());
+        dto.setSenderId(message.getSender().getId());
+        dto.setReceiverId(message.getReceiver().getId());
+        dto.setTimestamp(message.getTimestamp());
+        dto.setUnread(message.getIsUnread());
+        dto.setId(message.getId());
+        dto.setUnread(Boolean.TRUE.equals(message.getIsUnread())); // <-- safer check here
+
+        return dto;
+    }
+    @PutMapping("/{id}/read")
+    public ResponseEntity<?> markAsRead(@PathVariable Long id, Principal principal) {
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Message not found"));
+
+        String currentUsername = principal.getName();
+        if (!message.getReceiver().getUsername().equals(currentUsername)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("You can only mark your own received messages as read.");
+        }
+
+        message.setIsUnread(false);
+        messageRepository.save(message);
+        return ResponseEntity.ok().build();
+    }
+
+
+
 }
