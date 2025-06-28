@@ -88,6 +88,7 @@ public class AuctionController {
                     dto.setBidCounts(auction.getBidCount());
                     dto.setStartPrice(auction.getStartingPrice());
                     dto.setStatus(auction.getStatus());
+
                     // Map seller
                     SellerSummaryDTO sellerDto = new SellerSummaryDTO();
                     sellerDto.setId(auction.getSeller().getId());

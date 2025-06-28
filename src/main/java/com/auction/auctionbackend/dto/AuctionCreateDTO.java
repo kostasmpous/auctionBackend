@@ -16,4 +16,5 @@ public class AuctionCreateDTO {
     private String country;
     private Set<Long> categoryIds;
     private Double buyoutprice;
+
 }
