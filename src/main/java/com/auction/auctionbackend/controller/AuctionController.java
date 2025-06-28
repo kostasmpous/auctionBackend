@@ -2,13 +2,16 @@ package com.auction.auctionbackend.controller;
 
 import com.auction.auctionbackend.dto.*;
 import com.auction.auctionbackend.model.Auction;
+import com.auction.auctionbackend.model.Category;
 import com.auction.auctionbackend.model.User;
 import com.auction.auctionbackend.repository.AuctionRepository;
 import com.auction.auctionbackend.repository.BidRepository;
+import com.auction.auctionbackend.repository.CategoryRepository;
 import com.auction.auctionbackend.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.security.PrivateKey;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,16 +25,42 @@ public class AuctionController {
     private final BidRepository bidRepository;
     private final UserRepository userRepository;
 
-    public AuctionController(AuctionRepository auctionRepository, BidRepository bidRepository,UserRepository userRepository ) {
+    private final CategoryRepository categoryRepository;
+
+    public AuctionController(AuctionRepository auctionRepository, BidRepository bidRepository, UserRepository userRepository, CategoryRepository categoryRepository) {
         this.auctionRepository = auctionRepository;
         this.bidRepository = bidRepository;
         this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @PostMapping
-    public Auction createAuction(@RequestBody Auction auction) {
+    public Auction createAuction(@RequestBody AuctionCreateDTO dto, Principal principal) {
+        String username = principal.getName();
+        User seller = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Auction auction = new Auction();
+        auction.setName(dto.getName());
+        auction.setDescription(dto.getDescription());
+        auction.setStartTime(dto.getStartTime());
+        auction.setEndTime(dto.getEndTime());
+        auction.setStartingPrice(dto.getStartingPrice());
+        auction.setCurrentPrice(dto.getStartingPrice()); // default
+        auction.setLocation(dto.getLocation());
+        auction.setCountry(dto.getCountry());
+        auction.setSeller(seller);
+
+        Set<Category> categories = dto.getCategoryIds().stream()
+                .map(id -> categoryRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("Category not found: " + id)))
+                .collect(Collectors.toSet());
+
+        auction.setCategories(categories);
+
         return auctionRepository.save(auction);
     }
+
 
 
 
