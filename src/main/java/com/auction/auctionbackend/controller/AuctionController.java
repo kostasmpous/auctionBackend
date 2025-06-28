@@ -181,9 +181,9 @@ public class AuctionController {
 
         // Check if there are bids or if auction already started
         boolean hasBids = bidRepository.existsByAuctionId(id);
-        boolean hasStarted = auction.getStartTime().isBefore(java.time.LocalDateTime.now());
+        //boolean hasStarted = auction.getStartTime().isBefore(java.time.LocalDateTime.now());
 
-        if (hasBids || hasStarted) {
+        if (hasBids) {
             throw new RuntimeException("Cannot delete auction that has already started or has bids.");
         }
 
