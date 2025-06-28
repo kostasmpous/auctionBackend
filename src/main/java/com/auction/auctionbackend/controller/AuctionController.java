@@ -2,6 +2,7 @@ package com.auction.auctionbackend.controller;
 
 import com.auction.auctionbackend.dto.*;
 import com.auction.auctionbackend.model.Auction;
+import com.auction.auctionbackend.model.AuctionStatus;
 import com.auction.auctionbackend.model.Category;
 import com.auction.auctionbackend.model.User;
 import com.auction.auctionbackend.repository.AuctionRepository;
@@ -66,6 +67,7 @@ public class AuctionController {
     @GetMapping
     public List<AuctionListDTO> getAllAuctions() {
         return auctionRepository.findAllWithCategoriesAndSeller().stream()
+                .filter(auction -> auction.getStatus() != AuctionStatus.ENDED) // Exclude ended
                 .map(auction -> {
                     AuctionListDTO dto = new AuctionListDTO();
                     dto.setId(auction.getId());

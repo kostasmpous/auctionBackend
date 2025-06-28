@@ -10,12 +10,13 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "auctions")  // Replace with your actual Neon schema
+@Table(name = "auctions")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Auction {
+
     @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +41,7 @@ public class Auction {
     @Column(name = "current_price")
     private Double currentPrice;
 
-    private String location;  // e.g. city/country
+    private String location;
 
     private String country;
 
@@ -61,4 +62,8 @@ public class Auction {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categories;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AuctionStatus status;
 }
