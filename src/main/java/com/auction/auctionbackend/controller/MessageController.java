@@ -120,6 +120,20 @@ public class MessageController {
         int count = messageRepository.countByReceiverAndIsUnreadTrue(user);
         return ResponseEntity.ok(count);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getMessageById(@PathVariable Long id, Principal principal) {
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Message not found"));
+
+        String currentUsername = principal.getName();
+        if (!message.getSender().getUsername().equals(currentUsername) &&
+                !message.getReceiver().getUsername().equals(currentUsername)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("You are not authorized to view this message.");
+        }
+
+        return ResponseEntity.ok(toDTO(message));
+    }
 
 
 
