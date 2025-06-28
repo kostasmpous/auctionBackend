@@ -126,19 +126,30 @@ public class AuctionController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteAuction(@PathVariable Long id) {
+    public void deleteAuction(@PathVariable Long id, Principal principal) {
         Auction auction = auctionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Auction not found"));
 
-        boolean hasBids = bidRepository.existsByAuctionId(id);
-        boolean hasNotStarted = auction.getStartTime().isAfter(java.time.LocalDateTime.now());
+        // Check if current user is the seller
+        String username = principal.getName();
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (hasBids || !hasNotStarted) {
+        if (!auction.getSeller().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Unauthorized to delete this auction");
+        }
+
+        // Check if there are bids or if auction already started
+        boolean hasBids = bidRepository.existsByAuctionId(id);
+        boolean hasStarted = auction.getStartTime().isBefore(java.time.LocalDateTime.now());
+
+        if (hasBids || hasStarted) {
             throw new RuntimeException("Cannot delete auction that has already started or has bids.");
         }
 
         auctionRepository.delete(auction);
     }
+
     @GetMapping("/my-auctions")
     public List<AuctionListDTO> getMyAuctions(Principal principal) {
         String username = principal.getName();
