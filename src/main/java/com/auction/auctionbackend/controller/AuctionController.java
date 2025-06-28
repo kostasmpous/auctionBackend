@@ -281,9 +281,6 @@ public class AuctionController {
         User currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!auction.getSeller().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("Unauthorized to end this auction");
-        }
 
         if (auction.getStatus() == AuctionStatus.ENDED) {
             throw new RuntimeException("Auction is already ended");
