@@ -274,6 +274,23 @@ public class AuctionController {
             return dto;
         }).toList();
     }
+    @PutMapping("/{id}/end")
+    public Auction endAuctionManually(@PathVariable Long id, Principal principal) {
+        Auction auction = auctionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Auction not found"));
+
+        String username = principal.getName();
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Allow ending only if it hasn’t already ended
+        if (auction.getStatus() == AuctionStatus.ENDED) {
+            throw new RuntimeException("Auction is already ended");
+        }
+
+        auction.setStatus(AuctionStatus.ENDED);
+        return auctionRepository.save(auction);
+    }
 
 
 
