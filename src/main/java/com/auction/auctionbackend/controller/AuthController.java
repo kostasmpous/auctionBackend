@@ -8,6 +8,7 @@ import com.auction.auctionbackend.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,22 +19,25 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
         Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-        // Example: hardcoded user (replace with real validation)
-            // Compare passwords
-            if (user.getPassword().equals(request.getPassword())) {  // Plain text example (⚠ not safe for prod)
+
+            // Use secure hash check
+            if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
                 String token = JwtUtil.generateToken(user.getUsername());
                 return ResponseEntity.ok(new JwtResponseDTO(token));
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
     }
+
 }

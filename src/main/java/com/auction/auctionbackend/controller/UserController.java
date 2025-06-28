@@ -2,6 +2,7 @@ package com.auction.auctionbackend.controller;
 
 import com.auction.auctionbackend.model.User;
 import com.auction.auctionbackend.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,15 +14,19 @@ public class UserController {
 
     private final UserRepository userRepository;
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final PasswordEncoder passwordEncoder;
 
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
     // Create a new user
     @PostMapping
     public User createUser(@RequestBody User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword())); // hash the password
         return userRepository.save(user);
     }
+
 
     // Get all users
     @GetMapping
