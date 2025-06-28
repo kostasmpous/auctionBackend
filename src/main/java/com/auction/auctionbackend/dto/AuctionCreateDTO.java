@@ -15,4 +15,5 @@ public class AuctionCreateDTO {
     private String location;
     private String country;
     private Set<Long> categoryIds;
+    private Double buyoutprice;
 }

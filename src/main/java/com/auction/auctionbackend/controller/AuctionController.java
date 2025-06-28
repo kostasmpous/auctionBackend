@@ -50,6 +50,7 @@ public class AuctionController {
         auction.setLocation(dto.getLocation());
         auction.setCountry(dto.getCountry());
         auction.setSeller(seller);
+        auction.setBuyoutPrice(dto.getBuyoutprice());
 
         Set<Category> categories = dto.getCategoryIds().stream()
                 .map(id -> categoryRepository.findById(id)
