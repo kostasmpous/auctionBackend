@@ -7,6 +7,7 @@ import com.auction.auctionbackend.repository.PhotoRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/photos")
@@ -30,5 +31,15 @@ public class PhotoController {
         photo.setAuction(auction);
 
         return ResponseEntity.ok(photoRepository.save(photo));
+    }
+
+    // ✅ NEW: Get all photos for a specific auction
+    @GetMapping("/auction/{auctionId}")
+    public ResponseEntity<List<Photo>> getPhotosByAuction(@PathVariable Long auctionId) {
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(() -> new RuntimeException("Auction not found"));
+
+        List<Photo> photos = photoRepository.findByAuctionId(auctionId);
+        return ResponseEntity.ok(photos);
     }
 }
