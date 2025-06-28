@@ -1,5 +1,6 @@
 package com.auction.auctionbackend.dto;
 
+import com.auction.auctionbackend.model.AuctionStatus;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,5 +23,6 @@ public class AuctionDetailDTO {
     private List<BidDTO> bids;
     private int bidCount;
     private List<String> photoUrls;
+    private AuctionStatus status;
 
 }

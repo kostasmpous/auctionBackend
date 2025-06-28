@@ -38,9 +38,6 @@ public class Auction {
     @Column(name = "buyout_price")
     private Double buyoutPrice;
 
-    @Column(name = "current_price")
-    private Double currentPrice;
-
     private String location;
 
     private String country;
@@ -51,6 +48,9 @@ public class Auction {
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
+
+    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bid> bids = new ArrayList<>();
 
     @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Photo> photos = new ArrayList<>();
@@ -66,4 +66,12 @@ public class Auction {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AuctionStatus status;
+
+    // Dynamically calculate the current price
+    public Double getCurrentPrice() {
+        return bids.stream()
+                .mapToDouble(Bid::getAmount)
+                .max()
+                .orElse(startingPrice);
+    }
 }

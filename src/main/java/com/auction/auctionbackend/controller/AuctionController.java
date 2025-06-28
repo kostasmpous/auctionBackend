@@ -12,6 +12,7 @@ import com.auction.auctionbackend.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,6 @@ public class AuctionController {
         auction.setStartTime(dto.getStartTime());
         auction.setEndTime(dto.getEndTime());
         auction.setStartingPrice(dto.getStartingPrice());
-        auction.setCurrentPrice(dto.getStartingPrice()); // default
         auction.setLocation(dto.getLocation());
         auction.setCountry(dto.getCountry());
         auction.setSeller(seller);
@@ -57,7 +57,15 @@ public class AuctionController {
                 .collect(Collectors.toSet());
 
         auction.setCategories(categories);
-
+        // Determine status based on current time
+        LocalDateTime now = LocalDateTime.now();
+        if (dto.getStartTime().isAfter(now)) {
+            auction.setStatus(AuctionStatus.UPCOMING);
+        } else if (dto.getEndTime().isAfter(now)) {
+            auction.setStatus(AuctionStatus.ACTIVE);
+        } else {
+            auction.setStatus(AuctionStatus.ENDED); // Shouldn't normally happen on creation
+        }
         return auctionRepository.save(auction);
     }
 
@@ -78,6 +86,7 @@ public class AuctionController {
                     dto.setCurrentPrice(auction.getCurrentPrice());
                     dto.setBidCounts(auction.getBidCount());
                     dto.setStartPrice(auction.getStartingPrice());
+                    dto.setStatus(auction.getStatus());
                     // Map seller
                     SellerSummaryDTO sellerDto = new SellerSummaryDTO();
                     sellerDto.setId(auction.getSeller().getId());
@@ -119,6 +128,7 @@ public class AuctionController {
         dto.setLocation(auction.getLocation());
         dto.setCountry(auction.getCountry());
         dto.setBidCount(Math.toIntExact(auction.getBidCount()));
+        dto.setStatus(auction.getStatus());
 
         SellerSummaryDTO sellerDto = new SellerSummaryDTO();
         sellerDto.setId(auction.getSeller().getId());
