@@ -112,6 +112,17 @@ public class MessageController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/unread/count")
+    public ResponseEntity<Integer> getUnreadMessageCount(Principal principal) {
+        User user = userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        int count = messageRepository.countByReceiverAndIsUnreadTrue(user);
+        return ResponseEntity.ok(count);
+    }
+
+
+
 
 
 }

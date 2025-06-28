@@ -11,7 +11,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findByReceiver(User receiver);
     List<Message> findBySender(User sender);
 
-    List<Message> findByReceiverAndIsUnreadTrue(User receiver); // For badge
+    int countByReceiverAndIsUnreadTrue(User receiver);
 
 
 }
