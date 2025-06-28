@@ -50,7 +50,7 @@ public class UserController {
         user.setTaxNumber(userDetails.getTaxNumber());
         user.setRatingAsSeller(userDetails.getRatingAsSeller());
         user.setRatingAsBidder(userDetails.getRatingAsBidder());
-        user.setRole(userDetails.getRole());
+        //user.setRole(userDetails.getRole());
         return userRepository.save(user);
     }
 

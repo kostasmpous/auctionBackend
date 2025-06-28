@@ -18,8 +18,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()  // allow login
-                        .requestMatchers("/api/**").authenticated()   // require JWT for other API routes
+                        .requestMatchers("/api/auth/**", "/api/users").permitAll() // allow login and register
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

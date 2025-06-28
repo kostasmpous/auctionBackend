@@ -36,6 +36,4 @@ public class User {
 
     @Column(name = "rating_as_bidder")
     private Double ratingAsBidder;
-
-    private String role; // SELLER or BIDDER
 }
