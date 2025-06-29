@@ -43,7 +43,7 @@ public class UserController {
     }
 
     // Update user (basic example)
-    @PutMapping("/{id}")
+    /*@PutMapping("/{id}")
     public User updateUser(@PathVariable Long id, @RequestBody User userDetails) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         user.setUsername(userDetails.getUsername());
@@ -60,7 +60,7 @@ public class UserController {
         //user.setRole(userDetails.getRole());
         return userRepository.save(user);
     }
-
+*/
     // Delete a User
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
