@@ -1,5 +1,6 @@
 package com.auction.auctionbackend.controller;
 
+import com.auction.auctionbackend.dto.UserUpdateDTO;
 import com.auction.auctionbackend.model.User;
 import com.auction.auctionbackend.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -65,4 +66,35 @@ public class UserController {
     public void deleteUser(@PathVariable Long id) {
         userRepository.deleteById(id);
     }
+
+    @PutMapping("/{id}")
+    public User updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO dto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setUsername(dto.getUsername());
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setEmail(dto.getEmail());
+        user.setPhone(dto.getPhone());
+        user.setAddress(dto.getAddress());
+        user.setLocation(dto.getLocation());
+        user.setTaxNumber(dto.getTaxNumber());
+        user.setRatingAsSeller(dto.getRatingAsSeller());
+        user.setRatingAsBidder(dto.getRatingAsBidder());
+
+        return userRepository.save(user);
+    }
+
+    @PutMapping("/{id}/password")
+    public void updatePassword(@PathVariable Long id, @RequestBody String newPassword) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+
 }
+
