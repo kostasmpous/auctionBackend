@@ -43,11 +43,6 @@ A live deployment is available on **Render**, so you can try the API without run
    ```
    The API will be available at `http://localhost:8080`.
 
-4. Run tests (optional):
-   ```bash
-   ./mvnw test
-   ```
-
 ## Docker
 
 A `Dockerfile` is included. To build and run the application in a container:
@@ -69,9 +64,6 @@ The API is also hosted on **Render**. You can access the live instance to test t
 ```
 https://meowsuo.github.io/auctionFrontend/#/auctions
 ```
-
-Replace the placeholder above with the actual Render URL of the deployed application.
-
 ## License
 
 This project is provided under the Apache 2.0 License.
