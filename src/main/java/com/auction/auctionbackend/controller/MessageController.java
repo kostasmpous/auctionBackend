@@ -38,12 +38,6 @@ public class MessageController {
         User receiver = userRepository.findById(dto.getReceiverId())
                 .orElseThrow(() -> new RuntimeException("Receiver not found"));
 
-        boolean hasBid = bidRepository.existsByAuction_SellerAndBidder(receiver, sender);
-
-        if (!hasBid) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("You can only message sellers you have placed a bid with.");
-        }
 
         Message message = new Message();
         message.setContent(dto.getContent());
