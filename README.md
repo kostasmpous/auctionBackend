@@ -67,7 +67,7 @@ docker run -p 8080:8080 \
 The API is also hosted on **Render**. You can access the live instance to test the endpoints without any setup:
 
 ```
-https://<your-render-url>
+https://meowsuo.github.io/auctionFrontend/#/auctions
 ```
 
 Replace the placeholder above with the actual Render URL of the deployed application.
