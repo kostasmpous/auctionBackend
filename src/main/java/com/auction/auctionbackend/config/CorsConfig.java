@@ -14,10 +14,10 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://meowsuo.github.io")
+                        .allowedOrigins("https://meowsuo.github.io", "http://localhost:5173","http://localhost:4200")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
-                        .allowCredentials(false); // Only true if you're using cookies
+                        .allowCredentials(false);
             }
         };
     }
