@@ -77,9 +77,9 @@ public class UserController {
         userRepository.deleteById(id);
     }
 
-    @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO dto) {
-        User user = userRepository.findById(id)
+    @PutMapping("/username/{username}")
+    public ResponseEntity<User> updateUserByUsername(@PathVariable String username, @RequestBody UserUpdateDTO dto) {
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setUsername(dto.getUsername());
@@ -93,8 +93,11 @@ public class UserController {
         user.setRatingAsSeller(dto.getRatingAsSeller());
         user.setRatingAsBidder(dto.getRatingAsBidder());
 
-        return userRepository.save(user);
+        User updatedUser = userRepository.save(user);
+        return ResponseEntity.ok(updatedUser);
     }
+
+
 
     @PutMapping("/{id}/password")
     public void updatePassword(@PathVariable Long id, @RequestBody String newPassword) {
