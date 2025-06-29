@@ -28,7 +28,7 @@ public class User {
     private String email;
     private String phone;
     private String address;
-    private String location; // e.g., city/country
+    private String location;
     private String taxNumber; // AFM
 
     @Column(name = "rating_as_seller")

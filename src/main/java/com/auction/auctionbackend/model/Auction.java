@@ -45,6 +45,7 @@ public class Auction {
     @Formula("(SELECT COUNT(*) FROM bids b WHERE b.auction_id = id)")
     private Long bidCount;
 
+
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
@@ -54,6 +55,7 @@ public class Auction {
 
     @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Photo> photos = new ArrayList<>();
+
 
     @ManyToMany
     @JoinTable(
@@ -67,7 +69,9 @@ public class Auction {
     @Column(nullable = false)
     private AuctionStatus status;
 
-    // Dynamically calculate the current price
+
+
+    // Dynamically calculate the current price of the auction checking the bids
     public Double getCurrentPrice() {
         return bids.stream()
                 .mapToDouble(Bid::getAmount)

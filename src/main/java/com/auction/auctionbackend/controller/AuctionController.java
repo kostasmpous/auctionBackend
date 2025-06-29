@@ -4,22 +4,18 @@ import com.auction.auctionbackend.dto.*;
 import com.auction.auctionbackend.model.*;
 import com.auction.auctionbackend.repository.*;
 import org.springframework.web.bind.annotation.*;
-
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/auctions")
 public class AuctionController {
-
     private final AuctionRepository auctionRepository;
     private final BidRepository bidRepository;
     private final UserRepository userRepository;
-
     private final CategoryRepository categoryRepository;
     private final MessageRepository messageRepository;
 
@@ -52,7 +48,6 @@ public class AuctionController {
                 .map(id -> categoryRepository.findById(id)
                         .orElseThrow(() -> new RuntimeException("Category not found: " + id)))
                 .collect(Collectors.toSet());
-
         auction.setCategories(categories);
         // Determine status based on current time
         LocalDateTime now = LocalDateTime.now();
@@ -69,10 +64,11 @@ public class AuctionController {
 
 
 
+
     @GetMapping
     public List<AuctionListDTO> getAllAuctions() {
         return auctionRepository.findAllWithCategoriesAndSeller().stream()
-                .filter(auction -> auction.getStatus() != AuctionStatus.ENDED) // Exclude ended
+                .filter(auction -> auction.getStatus() != AuctionStatus.ENDED) // Exclude ended auctions to not display it in homepage
                 .map(auction -> {
                     AuctionListDTO dto = new AuctionListDTO();
                     dto.setId(auction.getId());
@@ -85,14 +81,14 @@ public class AuctionController {
                     dto.setStartPrice(auction.getStartingPrice());
                     dto.setStatus(auction.getStatus());
 
-                    // Map seller
+                    // Create the seller DTO to include
                     SellerSummaryDTO sellerDto = new SellerSummaryDTO();
                     sellerDto.setId(auction.getSeller().getId());
                     sellerDto.setName(auction.getSeller().getFirstName());
                     sellerDto.setLastName(auction.getSeller().getLastName());
                     dto.setSeller(sellerDto);
 
-                    // Map categories
+                    // Add categories
                     Set<CategorySummaryDTO> categoryDtos = auction.getCategories().stream()
                             .map(cat -> {
                                 CategorySummaryDTO cDto = new CategorySummaryDTO();
@@ -112,7 +108,7 @@ public class AuctionController {
     @GetMapping("/{id}")
     public AuctionDetailDTO getAuctionById(@PathVariable Long id) {
         Auction auction = auctionRepository.findByIdWithCategoriesAndSeller(id)
-                .orElseThrow(() -> new RuntimeException("Auction not found"));
+                .orElseThrow(() -> new RuntimeException("Auction failed to be found"));
 
         AuctionDetailDTO dto = new AuctionDetailDTO();
         dto.setId(auction.getId());
@@ -166,15 +162,15 @@ public class AuctionController {
     @DeleteMapping("/{id}")
     public void deleteAuction(@PathVariable Long id, Principal principal) {
         Auction auction = auctionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Auction not found"));
+                .orElseThrow(() -> new RuntimeException("Auction is not found"));
 
         // Check if current user is the seller
         String username = principal.getName();
         User currentUser = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User is not found"));
 
         if (!auction.getSeller().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("Unauthorized to delete this auction");
+            throw new RuntimeException("Unauthorized delete auction");
         }
 
         // Check if there are bids or if auction already started
@@ -182,7 +178,7 @@ public class AuctionController {
         //boolean hasStarted = auction.getStartTime().isBefore(java.time.LocalDateTime.now());
 
         if (hasBids) {
-            throw new RuntimeException("Cannot delete auction that has already started or has bids.");
+            throw new RuntimeException("Cannot delete auction");
         }
 
         auctionRepository.delete(auction);
@@ -192,14 +188,14 @@ public class AuctionController {
     public List<AuctionListDTO> getMyAuctions(Principal principal) {
         String username = principal.getName();
 
-        // Fetch the seller (user)
+        // Fetch the seller- user to use later
         User seller = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Fetch auctions created by this seller
+        // Fetch auctions created by this seller to use later
         List<Auction> auctions = auctionRepository.findBySellerIdWithCategories(seller.getId());
 
-        // Map to DTO
+        // Map to DTO to include all the info we want
         return auctions.stream().map(auction -> {
             AuctionListDTO dto = new AuctionListDTO();
             dto.setId(auction.getId());
@@ -232,7 +228,7 @@ public class AuctionController {
 
     @PutMapping("/{id}")
     public Auction editAuction(@PathVariable Long id, @RequestBody Auction updatedAuction, Principal principal) {
-        // Get current user from JWT
+        // Use the JWT to exctract the user
         String username = principal.getName();
         User currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -240,14 +236,14 @@ public class AuctionController {
         Auction existingAuction = auctionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Auction not found"));
 
-        // Allow only the seller to update
+        // Allow only the seller to be updated
         if (!existingAuction.getSeller().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("Unauthorized to edit this auction");
+            throw new RuntimeException("Unauthorized edit");
         }
 
-        // Allow edit only if auction has not ended
+        // Allow edit only if auction has not ended yet
         if (existingAuction.getEndTime().isBefore(java.time.LocalDateTime.now())) {
-            throw new RuntimeException("Cannot edit an auction that has already ended");
+            throw new RuntimeException("Cannot edit an auction that ended");
         }
 
         // Update only description and endTime
@@ -293,12 +289,12 @@ public class AuctionController {
         var highestBidOpt = bidRepository.findTopByAuctionOrderByAmountDesc(auction);
 
         if (highestBidOpt.isPresent()) {
-            var winningBid = highestBidOpt.get();
-            var winner = winningBid.getBidder();
+            var wBid = highestBidOpt.get();
+            var winner = wBid.getBidder();
 
             // Create message to the winner
             Message message = new Message();
-            message.setSender(auction.getSeller()); // seller
+            message.setSender(auction.getSeller());
             message.setReceiver(winner);
             message.setContent("Congratulations! You won the auction for '" + auction.getName() + "'. Please contact me as soon as possible to arrange the transaction.");
             message.setTimestamp(LocalDateTime.now());

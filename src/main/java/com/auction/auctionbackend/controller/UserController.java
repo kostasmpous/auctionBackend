@@ -28,6 +28,7 @@ public class UserController {
     }
 
 
+
     // Get all users
     @GetMapping
     public List<User> getAllUsers() {
@@ -59,7 +60,7 @@ public class UserController {
         return userRepository.save(user);
     }
 
-    // Delete user
+    // Delete a User
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         userRepository.deleteById(id);

@@ -49,12 +49,14 @@ public class MessageController {
         MessageDTO responseDto = new MessageDTO();
         responseDto.setContent(message.getContent());
         responseDto.setReceiverId(message.getReceiver().getId());
+
         responseDto.setSenderId(message.getSender().getId());
         responseDto.setTimestamp(message.getTimestamp());
         responseDto.setUnread(message.getIsUnread());
         return ResponseEntity.ok(responseDto);
 
     }
+
 
 
 
@@ -67,7 +69,6 @@ public class MessageController {
                 .map(this::toDTO)
                 .toList();
     }
-
     @GetMapping("/sent")
     public List<MessageDTO> getSentMessages(Principal principal) {
         User user = userRepository.findByUsername(principal.getName())
@@ -78,6 +79,7 @@ public class MessageController {
                 .toList();
     }
 
+
     private MessageDTO toDTO(Message message) {
         MessageDTO dto = new MessageDTO();
         dto.setContent(message.getContent());
@@ -86,6 +88,7 @@ public class MessageController {
         dto.setTimestamp(message.getTimestamp());
         dto.setUnread(message.getIsUnread());
         dto.setId(message.getId());
+
         dto.setReceiverUsername(message.getReceiver().getUsername());
         dto.setUnread(Boolean.TRUE.equals(message.getIsUnread())); // <-- safer check here
         dto.setSenderUsername(message.getSender().getUsername());
@@ -120,11 +123,11 @@ public class MessageController {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Message not found"));
 
-        String currentUsername = principal.getName();
-        if (!message.getSender().getUsername().equals(currentUsername) &&
-                !message.getReceiver().getUsername().equals(currentUsername)) {
+        String curUsername = principal.getName();
+        if (!message.getSender().getUsername().equals(curUsername) &&
+                !message.getReceiver().getUsername().equals(curUsername)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("You are not authorized to view this message.");
+                    .body("not authorized to view message.");
         }
 
         return ResponseEntity.ok(toDTO(message));

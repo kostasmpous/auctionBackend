@@ -24,7 +24,8 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    /*Use this to crosscheck username and password and we generate the JWT
+     for the user and return it to be used to later APIs*/
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
         Optional<User> userOpt = userRepository.findByUsername(request.getUsername());

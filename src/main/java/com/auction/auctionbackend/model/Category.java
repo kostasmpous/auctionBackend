@@ -4,9 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.Set;
-
 @Entity
-@Table(name = "categories")  // Replace it with your Neon schema
+@Table(name = "categories")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

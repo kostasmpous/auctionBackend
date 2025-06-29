@@ -19,9 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/bids")
 public class BidController {
-
     private final BidRepository bidRepository;
-    // Add dependencies to the constructor
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
 
@@ -30,9 +28,7 @@ public class BidController {
         this.auctionRepository = auctionRepository;
         this.userRepository = userRepository;
     }
-
-
-    // Create bid
+    // Create a bid API
     @PostMapping
     public ResponseEntity<BidDTO> createBid(@RequestBody BidRequestDTO request) {
 
@@ -52,7 +48,7 @@ public class BidController {
 
         Bid saved = bidRepository.save(bid);
 
-        // Convert to DTO
+        // create DTO for BID
         BidDTO dto = new BidDTO();
         dto.setId(saved.getId());
         dto.setAmount(saved.getAmount());
@@ -63,7 +59,7 @@ public class BidController {
 
         return ResponseEntity.ok(dto);
     }
-
+    //Get all bids
     @GetMapping
     public List<BidDTO> getAllBids() {
         return bidRepository.findAll().stream()
@@ -84,7 +80,7 @@ public class BidController {
     }
 
 
-    // Get bid by ID
+    // Get all the data of the bid by ID
     @GetMapping("/{id}")
     public BidDTO getBidById(@PathVariable Long id) {
         Bid bid = bidRepository.findById(id)

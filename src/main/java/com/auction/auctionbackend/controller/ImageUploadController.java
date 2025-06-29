@@ -12,7 +12,7 @@ import java.util.Base64;
 @RestController
 @RequestMapping("/api/images")
 public class ImageUploadController {
-
+    //Client ID and URL we got from IMGUR to use it as a repository for our uploaded photos and fetch them later in the app
     private static final String IMGUR_UPLOAD_URL = "https://api.imgur.com/3/image";
     private static final String IMGUR_CLIENT_ID = "39439e60afc78fb";
 
