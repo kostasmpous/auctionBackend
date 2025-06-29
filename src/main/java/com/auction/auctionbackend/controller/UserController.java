@@ -3,6 +3,7 @@ package com.auction.auctionbackend.controller;
 import com.auction.auctionbackend.dto.UserUpdateDTO;
 import com.auction.auctionbackend.model.User;
 import com.auction.auctionbackend.repository.UserRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +41,15 @@ public class UserController {
     @GetMapping("/{id}")
     public Optional<User> getUserById(@PathVariable Long id) {
         return userRepository.findById(id);
+    }
+
+
+    @GetMapping("/username/{username}")
+    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+        return user
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // Update user (basic example)
